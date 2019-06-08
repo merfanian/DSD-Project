@@ -1,7 +1,6 @@
 \documentclass{report}
 \usepackage[utf8]{inputenc}
 \usepackage[a4paper,margin=3cm,top=2cm]{geometry}
-\usepackage{natbib}
 \usepackage{graphicx}
 % graphics
 \usepackage{tikz}
@@ -11,6 +10,7 @@
 \usepackage[indentafter]{titlesec}
 \usepackage{xlop}
 \usepackage{caption,subcaption}
+\usepackage{setspace}
 %listings
 \usepackage{xcolor}
 \usepackage{listings}
@@ -20,15 +20,17 @@
 \fancyhead[LE,RO]{\leftmark}
 \fancyhead[RE,LO]{مستند پروژه طراحی سیستم‌های دیجیتال}
 \fancyfoot[LE,RO]{\thepage}
-\usepackage{xepersian}
 
-\settextfont[Scale=1.2,
- BoldFont={IRNazaninBold.ttf}, 
- ItalicFont={IRNazaninIrani.ttf}
-]{IRNazanin.ttf}
-\setlatintextfont[Scale=1,
+\onehalfspacing
+% persian
+\usepackage[extrafootnotefeatures,localise]{xepersian}
+\settextfont[
+Scale = 1.2]{XB Zar}
+\setlatintextfont[Scale=1.2,
  BoldFont={LiberationSerif-Bold.ttf}, 
  ItalicFont={LiberationSerif-Italic.ttf}]{LiberationSerif-Regular.ttf}
+
+
  
 \begin{document}
 
