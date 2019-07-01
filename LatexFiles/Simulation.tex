@@ -1,0 +1,116 @@
+\chapter{شبیه‌سازی}
+\noindent
+\textbf{
+\textit{
+توصیف روند شبیه‌سازی سخت‌افزار و گام‌های اجرایی، مشاهدهٔ ورودی‌ها و خروجی‌های اصلی و میانی، مقایسه با مقادیر حاصل از اجرای کد نرم‌افزاری (مدل طلایی)، توصیف مراحل اجزای الگوریتم به همراه شکل موج‌ها، نحوهٔ عملکرد 
+\lr{Testbench}
+}
+}
+\pagebreak
+
+\section{توضیح روند شبیه‌سازی سخت‌افزار و گام‌های اجرایی}
+برای شبیه‌سازی سخت‌افزاری کد 
+\lr{verilog}
+الگوریتم 
+\lr{Skein}
+را در محیط شبیه‌سازی 
+\lr{Modelsim}
+اجرا کردیم. گام‌های اجرایی به صورت کلی برای شبیه‌سازی کد سخت‌افزاری موارد زیر بود. 
+\begin{itemize}
+\item
+مطالعه کد الگوریتم و تعیین ورودی‌ها
+\item
+نوشتن Testbench
+\item
+اجرای کد در محیط Modelsim با Testbenchهای مختلف
+\item
+گرفتن Waveform و مقادیر خروجی (اصلی و میانی)
+\end{itemize}
+\section{مشاهدهٔ ورودی‌ها و خروجی‌های اصلی و میانی}
+در ادامه ابتدا کد های Testbench اجرا شده بر الگوریتم و سپس Waveformهای حاصله و در انتها خروجی‌ها به صورت متنی آورده می‌شود.
+
+\subsection{توضیح نحوهٔ عملکرد Testbench}
+در ادامه ابتدا کد verilog نوشته‌شده برای هر Testbench آورده  و سپس توضیحاتی دربارهٔ آن ایراد شده است. 
+
+ \subsubsection{\lr{Testbench 1}}
+\begin{code}
+//First Testbench
+module top;
+    reg clk = 1'b0;
+    reg [511:0] midstate = 72;
+    reg [95:0] data = "hello" ;
+    reg [31:0] nonce = 13;
+    wire [511:0] hash;
+    always #1 clk = !clk;
+
+    skein512 skein(clk, midstate , data ,nonce , hash);
+    
+    initial
+  begin
+        #300 data = "how are you?";
+ 		#300 data = "bye";
+        #5000 $stop;
+  end
+endmodule
+\end{code}
+
+در این testbench ابتدا مقادیر ورودی ها ست میشود
+به ترتیب به ازای clock  و midstate و data و nonce مقادیر 0 و 72 و hello و 13 ست میشوند
+پس از 300 واحد زمانی مقدارdata تغییرمی کند و به how are you تبدیل میشود و پس از 300 واحد زمانی دیگر به bye تغییر میکند.
+ترتیب و مقدار hash در بخش مربوط به آن آمده است.
+
+\subsubsection{\lr{Testbench 2}}
+\begin{code}
+//Second Testbench
+module top;
+    reg clk = 1'b0;
+    reg [511:0] midstate = 72;
+    reg [95:0] data = "hello" ;
+    reg [31:0] nonce = 23;
+    wire [511:0] hash;
+    always #1 clk = !clk;
+
+    skein512 skein(clk, midstate , data ,nonce , hash);
+    
+    initial
+  begin
+        #300 data = "how are you?";
+  		#300 data = "bye";
+        #5000 $stop;
+  end
+endmodule
+\end{code}
+
+در این testbench نیز ابتدا مقادیر ورودی ها ست میشود
+به ترتیب به ازای clock  و midstate و data و nonce مقادیر 0 و 72 و hello و 23ست میشوند
+پس از 300 واحد زمانی مقدارdata تغییرمی کند و به how are you تبدیل میشود و پس از 300 واحد زمانی دیگر به bye تغییر میکند.
+ترتیب و مقدار hash در بخش مربوط به آن آمده است
+تنها تفاوت این بخش و بخش قبلی در مقادیر ورودی nonce است که از 13 به 23 تغییر داده شده است.
+
+
+\subsubsection{\lr{Testbench 3}}
+\begin{code}
+//Third Testbench
+module top;
+    reg clk = 1'b0;
+    reg [511:0] midstate = 72;
+    reg [95:0] data = "still awake" ;
+    reg [31:0] nonce = 23;
+    wire [511:0] hash;
+    always #1 clk = !clk;
+
+    skein512 skein(clk, midstate , data ,nonce , hash);
+    
+    initial
+  begin
+        #300 data = "working";
+        #6000 $stop;
+  end
+endmodule
+\end{code}
+در این testbench ابتدا مقادیر ورودی ها ست میشود
+به ترتیب به ازای clock  و midstate و data و nonce مقادیر 0 و 72 و still awake و 23 ست میشوند
+پس از 300 واحد زمانی مقدارdata تغییرمی کند وبه working تبدیل میشود.
+ترتیب و مقدار hash در بخش مربوط به آن آمده است.
+در این بخش با تغییر مقادیر اولیه و ثانویه data خروجی ها را با قسمت قبل مقایسه کردیم.
+
