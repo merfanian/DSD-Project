@@ -142,6 +142,8 @@ Skein
 افزوده است، در ادامه به صورت خلاصه به نحوهٔ عملکرد هر بخش می‌پردازیم.
 \footnote{برای مطالعه بیشتر می‌توانید به بخش سوم 
 \cite{main_doc} مراجعه کنید. }
+
+
 \subsection{\lr{The Threefish block cipher}}
 \lr{Threefish}
 یک بلوک رمزگذاری قابل تنظیم است که برای سه سایز بلوک مختلف تعریف شده است، ۲۵۶، ۵۱۲ و ۱۰۲۴ بیت. 
@@ -172,7 +174,167 @@ XOR
 \label{threefish_mix_function}
 \end{figure}
 
+\ref{threefish_mix_function}
+ نحوهٔ عملکرد 
+ \lr{Threefish-512}
+ را نشان می‌دهد، هر یک از مراحل هفتاد و دوگانهٔ الگوریتم
+ \lr{Skein-512}
+ از چهار تابع MIX
+ به همراه ضرب در یک کلمه ۶۴ بیتی انجام می‌شوند. ثابت‌های چرخش به شکلی انتخاب می‌شوند تا پخش‌شدگی را در هش به حداکثر خود برسانند. 
+ برای به دست آوردن مقدار 
+\lr{Threefish-512}
+۷۲ بار الگوریتم شکل
+\ref{threefish_block_cipher}
+تکرار می‌شود.
+\footnote{برای مطالعه جزیی‌تر می‌توانید به 
+\cite{main_doc}
+مراجعه کنید.}
 
+\begin{figure}
+\centering
+\includegraphics[scale=0.7]{figs/threefish_block_cipher.png}
+\caption{چهار مرحله از ۷۲ مرحلهٔ 
+\lr{Threefish-512 block cipher}}
+\label{threefish_block_cipher}
+\end{figure}
+
+
+\subsection{\lr{Unique Block Iteration}}
+\lr{Unique Block Iteration} 
+یا به اختصار 
+UBI
+زنجیره‌ای از ورودی‌ها را با یک رشته با طول دلخواه تلفیق می‌کند تا یک خروجی با اندازهٔ مورد نظر و ثابت به دست آورد، در حقیقت 
+UBI
+مقدار 
+\lr{The Threefish block cipher}
+را که مقداری با اندازهٔ نامشخص و تعیین‌نشده‌ست را به خروجی با مقداری با اندازهٔ ثابت تبدیل می‌کند، شکل 
+\ref{three_block_message}
+نحوهٔ محاسبه 
+UBI
+برای الگوریتم 
+\lr{Skein-512}
+را نشان می‌دهد، اندازهٔ ورودی ۱۶۶ بایت است که در سه بلوک ریخته شده است، بلوک‌های 
+$M_0$
+و 
+$M_1$
+هر کدام ۶۴ بایت دارند و 
+$M_2$ 
+که برچسب آخرین بلوک
+\footnote{\lr{final block}}
+را دارد باقی‌مانده اندازه یعنی ۳۸ بایت دارد. با استفاده از 
+tweak
+بلوک که قلب اصلی 
+UBI
+را تشکیل می‌دهد
+UBI 
+متوجه می‌شود که آیا تمامی بلوک‌ها برای ایجاد خروجی پردازش شده اند یا خیر و این که آیا به بلوک پایانی (پایان زنجیره) رسیده است یا خیر. 
+UBI 
+یکی از انواع 
+\lr{ Matyas-Meyer-Oseas}
+ها است.
+\cite{matyas}
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{figs/three_block_message.png}
+\caption{درهم‌سازی پیام سه بلوکه  با UBI}
+\label{three_block_message}
+\end{figure}
+
+\subsection{تابع درهم‌سازی Skein}
+تابع اصلی درهم‌سازی در حالت نرمال که مد نظر این نوشتار است برای ایجاد هش از چندین درخواست از 
+UBI
+و باالتبع از 
+\lr{Threefish block cipher}
+هش یک داده ورودی را حساب می‌کند، برای محاسبه هش سه بار UBI با ورودی‌های مختلف زیر صدا زده می‌شود، شکل 
+\ref{skein_hash}
+توضیحات زیر را به صورت شماتیک نشان می‌دهد. 
+\begin{itemize}
+\item
+\textbf{\lr{Config}
+}این ورودی مقدار اندازه خروجی و تعدادی از پارامتر‌ها برای 
+\lr{Tree-hashing}
+را فراهم می‌کند، در صورتی که از حالت استاندارد و نرمال 
+Skein 
+براش درهم‌سازی استفاده شود این مقدار قابل پیش‌پردازش است.
+
+\item
+\textbf{\lr{Message}
+}مقدار داده ورودی‌ست.
+\textbf{\item{Counter}
+}شمارنده‌ای برای نشان دادن تعداد بار تکرار الگوریتم ایجاد خروجی برای رسیدن به خروجی با اندازه مورد نظر است، در صورتی که خروجی بیش از اندازه‌ای مورد انتظار باشد، دوباره تابع ایجاد خروجی فراخوانی می‌شود. 
+\end{itemize}
+\begin{figure}[h]
+\centering
+\includegraphics[scale =.5]{figs/skein_hash.png}
+\caption{تابع ایجاد هش با خروجی بزرگ‌تر از اندازه مورد انتظار}
+\label{skein_hash}
+\end{figure}
+
+\subsection{\lr{Optional Arguments}}
+
+در راستای افزایش انعطاف‌پذیری الگوریتم درهم‌سازی skein برای کاربردهای مختلف تعدادی ورودی به صورت اختیاری به الگوریتم افزوده شده اند، در ادامه مختصرا به توضیح ایشان می‌پردازیم. 
+\begin{itemize}
+\item
+\textbf{\lr{Key}}
+(اختیاری)
+کلیدی برای تبدیل skein
+به تابع MAC یا KDF.
+\item
+\textbf{\lr{Configuration}}
+(اجباری)
+همان مقدار Config که پیش‌تر توضیح داده شد. 
+\item
+\textbf{\lr{Personalization}}
+(اختیاری)
+رشته‌ای که برنامه میتواند با استفاده از آن تابع‌های مختلفی برای کاربردهای مختلفی بسازد. 
+\item
+\textbf{\lr{Nonce}
+}(اختیاری)
+
+مقدار Nonce برای استفاده در حالت 
+\lr{stream cipher}
+و حالت درهم‌سازی تصادفی.
+\item
+\textbf{\lr{Message}
+}
+(اختیاری)
+
+ورودی نرمال تابع درهم‌‌سازی.
+
+\item
+\textbf{\lr{Output}
+}(اجباری)
+مقدار خروجی الگوریتم. 
+\end{itemize}
+
+\textit{در محاسبه هش تابع درهم‌سازی 
+Skein
+به ترتیب ذکر شده در بالا 
+UBI
+ورودی‌ها محاسبه می‌شود.
+}
+
+
+
+\section{کاربردهای الگوریتم درهم‌سازی Skein}
+\begin{itemize}
+
+\item \textbf{Skein به عنوان تابع درهم‌سازی}
+ساده‌ترین راه استفاده از الگوریتم Skein استفاده به عنوان تابعی برای به دست آوردن هش ورودی‌ست، در این حالت Skein مانند تمام الگوریتم‌های دیگر درهم‌سازی عمل می‌کند و رشته‌ای را به عنوان هش با اندازه ازپیش‌تعیین‌شده خروجی می‌دهد.
+\item \textbf{Skein به عنوان MAC}
+	از تابع درهم‌سازی Skein می‌توان برای تولید MAC
+\footnote{\lr{Message authentication code}}
+استفاده کرد، از 
+MAC 
+برای وارسی این که یک پیام از یک فرستنده معتبر بدون تغییر ارسال شده یا که در طی مسیر دست‌کاری شده است استفاده می‌شود. 
+\item \lr{\textbf{HMAC}}
+\item \textbf{\lr{Randomized Hashing}}
+\item \textbf{\lr{Digital Signatures}}
+\item \textbf{\lr{Key Derivation Function (KDF)}}
+\item \textbf{\lr{Password-Based Key Derivation Function (PBKDF)}}
+\item \textbf{\lr{PRNG}}
+\item \textbf{\lr{Stream Cipher}}
+\end{itemize}
 \begin{thebibliography}{1}
 
 
@@ -186,5 +348,12 @@ http://www.skein-hash.info/about\\
 Version 1.3 — 1 Oct 2010\\
 http://www.skein-hash.info/sites/default/files/skein1.3.pdf\\
 }
+
   
+  \bibitem{matyas}
+  \lr{ S.M. Matyas, C.H. Meyer, and J. Oseas, “Generating strong one-way functions with crypto-
+graphic algorithms\\” IBM Technical Disclosure Bulletin, Vol. 27, No. 10A, 1985, pp. 5658–5659.\\
+}
+
+
 \end{thebibliography}
