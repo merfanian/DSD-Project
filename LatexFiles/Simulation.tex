@@ -31,176 +31,99 @@
 های حاصله و در انتها خروجی‌ها به صورت متنی آورده می‌شود.
 
 \subsection{توضیح نحوهٔ عملکرد Testbench}
-در ادامه ابتدا کد verilog نوشته‌شده برای هر Testbench آورده  و سپس توضیحاتی دربارهٔ آن ایراد شده است. 
-
+در ادامه ابتدا کد verilog نوشته‌شده برای  Testbench آورده  و سپس توضیحاتی دربارهٔ آن ایراد شده است. 
+\pagebreak
  \subsubsection{\lr{Testbench 1}}
 \begin{code}
-//First Testbench
-module top;
-    reg clk = 1'b0;
-    reg [511:0] midstate = 72;
-    reg [95:0] data = "hello" ;
-    reg [31:0] nonce = 13;
-    wire [511:0] hash;
-    always #1 clk = !clk;
+//Master Testbench example
 
-    skein512 skein(clk, midstate , data ,nonce , hash);
-    
-    initial
-  begin
-        #300 data = "how are you?";
- 		#300 data = "bye";
-        #5000 $stop;
+module skein_tb;
+
+  // Inputs
+  reg clk;
+  reg [511:0] midstate;
+  reg [95:0] data;
+  reg [31:0] nonce;
+
+  // Outputs
+  wire [511:0] hash;
+
+  // Instantiate the Unit Under Test (UUT)
+  skein512 uut (
+    .clk(clk), 
+    .midstate(midstate), 
+    .data(data), 
+    .nonce(nonce), 
+    .hash(hash)
+  );
+
+  initial begin
+    // Initialize Inputs
+    clk = 0;
+    midstate = 0;
+    data = 0;
+    nonce = 0;
+
+    // Wait 100 ns for global reset to finish
+    #1000
+          data = 512'd12345609823;
+    midstate = 96'd456;
+    nonce = 32'd453;
+    #1000;    
+    data = 512'd7659432094555543122297600000000654;
+    midstate = 96'd456;
+    nonce = 32'd453;
+
   end
+   always 
+    #1 clk = ~clk;
+      
 endmodule
 \end{code}
 
-در این testbench ابتدا مقادیر ورودی‌ها تنظیم می‌شوند
-به ترتیب به ازای clock  و midstate و data و nonce مقادیر 0 و 72 و 
-"hello"
- و 13 تنظیم می‌شوند
 
-پس از 300 واحد زمانی مقدار data تغییر می‌کند و به
-"how are you?"
- تبدیل می‌شود و پس از 300 واحد زمانی دیگر به 
- "bye"
- تغییر می‌کند.
-ترتیب و مقدار hash در بخش مربوط به آن آمده است.
-
-\subsubsection{\lr{Testbench 2}}
-\begin{code}
-//Second Testbench
-module top;
-    reg clk = 1'b0;
-    reg [511:0] midstate = 72;
-    reg [95:0] data = "hello" ;
-    reg [31:0] nonce = 23;
-    wire [511:0] hash;
-    always #1 clk = !clk;
-
-    skein512 skein(clk, midstate , data ,nonce , hash);
-    
-    initial
-  begin
-        #300 data = "how are you?";
-  		#300 data = "bye";
-        #5000 $stop;
-  end
-endmodule
-\end{code}
-
-در این testbench نیز ابتدا مقادیر ورودی‌ها تنظیم می‌شوند،
-به ترتیب به ازای clock  و midstate و data و nonce مقادیر 0 و 72 و 
-"hello"
-و 23 تنظیم می‌شوند
-پس از 300 واحد زمانی مقدار data تغییر می‌کند و به 
-"how are you?"
-تبدیل می‌شود و پس از 300 واحد زمانی دیگر به 
-"bye"
- تغییر می‌کند.
-ترتیب و مقدار hash در بخش مربوط به آن آمده است
-تنها تفاوت این بخش و بخش قبلی در مقادیر ورودی nonce است که از 13 به 23 تغییر داده شده است.
-
-
-\subsubsection{\lr{Testbench 3}}
-\begin{code}
-//Third Testbench
-module top;
-    reg clk = 1'b0;
-    reg [511:0] midstate = 72;
-    reg [95:0] data = "still awake" ;
-    reg [31:0] nonce = 23;
-    wire [511:0] hash;
-    always #1 clk = !clk;
-
-    skein512 skein(clk, midstate , data ,nonce , hash);
-    
-    initial
-  begin
-        #300 data = "working";
-        #6000 $stop;
-  end
-endmodule
-\end{code}
-در این testbench ابتدا مقادیر ورودی ها تنظیم می‌شوند،
-به ترتیب به ازای clock  و midstate و data و nonce مقادیر 0 و 72 و 
-"still awake"
- و 23 تنظیم می‌شوند
-پس از 300 واحد زمانی مقدار data تغییر می‌کند وبه 
-"working"
- تبدیل می‌شود.
-ترتیب و مقدار hash در بخش مربوط به آن آمده است.
-در این بخش با تغییر مقادیر اولیه و ثانویه data خروجی ها را با قسمت قبل مقایسه کردیم.
-
-\subsection{مقادیر خروجی‌های حاصل از Testbench ها}
+\subsection{مقادیر خروجی‌های حاصل از Testbench}
 
 \subsubsection{\lr{Waveform 1}}
 \begin{figure}[H]
 \includegraphics[width = \textwidth]{figs/simulation/1.png}
-\caption{شبیه‌سازی با \lr{Testbench 1}}
+\caption{شبیه‌سازی با \lr{Testbench}}
 \label{simulation_1}
 \end{figure}
 
-\subsubsection{\lr{Waveform 2}}
-\begin{figure}[H]
-\includegraphics[width = \textwidth]{figs/simulation/2.png}
-\caption{شبیه‌سازی با \lr{Testbench 2}}
-\label{simulation_2}
-\end{figure}
-
-\subsubsection{\lr{Waveform 3}}
-\begin{figure}[H]
-\includegraphics[width = \textwidth]{figs/simulation/3.png}
-\caption{شبیه‌سازی با \lr{Testbench 3}}
-\label{simulation_3}
-\end{figure}
-
-\subsection{جدول خروجی‌های هش برای Testbench ها}
-
-\subsubsection{\lr{Output 1}}
-
+\subsection{جدول ورودی‌ها و خروجی‌های  Testbench}
 \lr{
 \begin{table}[H]
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}llll@{}}
 \toprule
-Final & Hash                                                                                                                                                                        & Time(clk) & Data \\ \midrule
-False & \begin{tabular}[c]{@{}l@{}}32b4b630366ea0d126796328ad99cf0dbb95b4b3b08bdac2c9965ab01993886\\ 499e4a150a5b7f93ac75eaad9c70cc3b2e7147887c5953849c9ddc96b2cbfa417\end{tabular} & 436       & hello         \\
-True  & \begin{tabular}[c]{@{}l@{}}0a91e84bf2aac4a1cf451cf9c42785f05c434a5ca1876c64382210c0c2102aa5\\ 2fa8064a67e7510a670d0558a54efbc789d6c9b0198258d85e797e82bfc0f26e\end{tabular} &           & hello         \\
-False & \begin{tabular}[c]{@{}l@{}}6c78a5eac175f4456c22f40253f9c2b877a1f8dc177ba179f9778f468c7ce8b3\\ 79a8d2f259227c9e2320eff4040ff3d81461a0ae93cb5d6fd4fa0b6c37334df9\end{tabular} &           & how are you?  \\
-True  & \begin{tabular}[c]{@{}l@{}}4241986e923784f32e84d6846b72123effa16f143d874cbeefc815dd972e15d9b\\ 3591d2d409de47c364dd6d7676ce4050220b28a762fa1dc39099280459c8e74\end{tabular} &           & how are you?  \\
-True  & \begin{tabular}[c]{@{}l@{}}aed5a975b556508072d512af282bbe56877874bd463a786544e3406875931cf\\ 8e5f8a7e823193eeed2904bc00ac5d3e7f81d8162667b7ac171f1fbd92dcda7e5\end{tabular} &           & bye           \\ \bottomrule
+Midstate & Nonce   & Data                                    & Time (clk) \\ \midrule
+0        & 0       & 0                                       & 1000 - 0          \\
+96'd456  & 32'd453 & 512'd12345609823                        & 2000 - 1000       \\
+96'd456  & 32'd453 & 512'd7659432094555543122297600000000654 & End - 2000        \\ \bottomrule
 \end{tabular}%
 }
 \rl{
-\caption{مقادیر درهم‌سازی و زمان با توجه به \lr{Testbench 1}}}
-\label{table_1}
-\end{table}
-}
-
-
-\subsubsection{\lr{Output 2}}
+\caption{مقادیر ورودی‌ها و زمان }}
+\label{table_input}
+\end{table}}
 
 \lr{
-% Please add the following required packages to your document preamble:
-% \usepackage{booktabs}
-% \usepackage{graphicx}
 \begin{table}[H]
 \resizebox{\textwidth}{!}{%
-\begin{tabular}{@{}llll@{}}
+\begin{tabular}{@{}ll@{}}
 \toprule
-Final & Hash                                                                                                                                                                        & Time(clk) & \textbf{Data} \\ \midrule
-False & \begin{tabular}[c]{@{}l@{}}27f43a0a48c65a7b90d2915a252b4ad97063a43818089082a95c2dbe5148ed7\\ 0c07604d0cdf5310df8b18c3f368b83516f7f4195b435d53900d5fe31c8f6ee20\end{tabular} & 436       & hello         \\
-True  & \begin{tabular}[c]{@{}l@{}}6f3cf358987dbc11d94249332776582ab1ec4e81ce512fa28e5f8d77dd9c6e04\\ 224c88f2b28bda6c0becf728f5e45c60bf20f22ca4f08a030f38db131694ce30\end{tabular} &           & hello         \\
-False & \begin{tabular}[c]{@{}l@{}}0ba7ffabb38454cdf8f29d2b33ef4a9a3ab103e20d9eeb8b55ef36707ced67952\\ 80c9695df1d5d1072939177e48994faaf226161fb3998b90254f5bc0e51ba2b\end{tabular} &           & how are you?  \\
-True  & \begin{tabular}[c]{@{}l@{}}f111a5230070d2fb2d6b333d2c2540c5352c61585f4e5ba3b485c7a33400a04\\ 17ff4898cba78441791013f571a1aafdf287d597b5162937d194ff67f6620f270\end{tabular} &           & how are you?  \\
-True  & \begin{tabular}[c]{@{}l@{}}9464642ce2e3f35da6af64bb4b5ffda92151870f81c98934946ff4921364cf80c\\ d134e927accac3ebe7d35d0e1ac9bf4933063a0a182a53d84f0c65e588e1b24\end{tabular} &           & bye           \\ \bottomrule
+Hash                                                                                                                                                                        & Time (clk) \\ \midrule
+\begin{tabular}[c]{@{}l@{}}ab5283d68df053ac62d053789d4b45b81a02c959d7cab97fc43451166351f117\\ f949fe918475f762ba80567046338211461648316d4432e6c505edc3b5ee6ff5\end{tabular} & 1217 - 433        \\
+\begin{tabular}[c]{@{}l@{}}dd477bfb0f07e299560b050c7aedb947bad77571f9a7d886a06f197a55f7946b\\ 8a9cecbb948a5478380168f8bfaf8e6d7d828459564973272b18cdf99d0234f2\end{tabular} & 1436 - 1217       \\
+\begin{tabular}[c]{@{}l@{}}0c0dea4dfd9994c6eb97f500589565239347be8a5b2e4ce4832c6cc9095baa51\\ bf2bdde45ef619f4086e71e7d86f637314357e6d20632c31612f5424644cc223\end{tabular} & 2217 - 1436       \\
+\begin{tabular}[c]{@{}l@{}}6d383e0cceb223c20c45b816a165072ad200b8091682e8e5c31295ee62ca3719\\ afbd493a4b85859d1cbe08d98bf01e66be18f3d3536987eeef06cc7965851bf8\end{tabular} & 2437 - 2217       \\
+\begin{tabular}[c]{@{}l@{}}6b722c1b1fb150c850e02ee44e03a447401ca4ac3cde4de6eb95b2e853d0d34b\\ 53583685f4b21f9b98229734756d7b835e46c2f589e461ab7c3177fb7e572b64\end{tabular} & End - 2437        \\ \bottomrule
 \end{tabular}%
 }
 \rl{
-\caption{مقادیر درهم‌سازی و زمان با توجه به \lr{Testbench 2}}}
-\label{table_2}
-\end{table}
-}
+\caption{مقادیر درهم‌سازی و زمان }}
+\label{table_hash}
+\end{table}}
 
 
