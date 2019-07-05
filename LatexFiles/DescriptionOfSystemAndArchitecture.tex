@@ -427,3 +427,161 @@ $Po0$ به ترتیب از 8 بیت-8بیت (ازبا  ارزش به کم ارز
 \end{itemize}
 
 \subsection{\lr{skein\_round\_1,2,3,4}}
+چهار ماژول باقی مانده با نام های
+\lr{ skein\_round\_1, skein\_round\_2, skein\_round\_3 , skein\_round\_4 }
+را به دلیل شباهت ساختاری با هم بررسی میکنیم.
+\subsubsection{اطلاعات کلی}
+\lr{
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\multicolumn{2}{l}{skein\_round\_1,2,3,4} \\ \midrule
+$clk, even, {[}511:0{]} in $   & inputs     \\
+${[}511:0{]} out    $          & outputs    \\ \bottomrule
+\end{tabular}
+\rl{
+\caption{ اطلاعات کلی ماژول‌های\lr{ skein\_round\_1,2,3,4}}}
+\label{table_skein_round_n}
+\end{table}}
+
+\begin{itemize}
+\item
+در هر 4 ماژول دو مجموعه wire گرفته شده است:
+\begin{itemize}
+\item
+64 بیتی : $p0, p1, p2, p3, p4, p5, p6, p7$
+\item
+64 بیتی :$ p0x,p1x,p2x,p3x,p4x,p5x,p6x,p7x$
+\end{itemize}
+\item
+مجموعه ای از assignment ها داریم:
+\begin{itemize}
+\item
+P0 تا p7 به ترتیب به 64 بیت های پرارزش تا کم ارزش in متصل اند. (p7 به کم ارزشترین)
+\end{itemize}
+\item
+Assignment های مربوط به $p0x$ تا $p7x$ برای 4 ماژول متفاوت است در نتیجه جداگانه بررسی میکنیم:
+\begin{itemize}
+\item ماژول ۱\\
+$Pkx$ ها با $k$ های زوج مقدار $pk + p(k+1)$ را به خود میگیرند. مثلا $p2x = p2 + p3$\\
+$P1x$ با توجه به $even$ مقدار میگیرد: 
+\begin{itemize}
+\item
+اگر $even$ یک باشد، { $p1[17:0], p1[63:18]$ } (خط شکاف بین بیت 17 و 18)
+\item
+اگر $even$ صفر باشد، { $p1[24:0], p1[63:25]$ } (خط شکاف بین بیت 24 و 25)
+\end{itemize}
+   $P3x$ با توجه به $even$ مقدار میگیرد: 
+ \begin{itemize}
+ \item
+ اگر $even$ یک باشد، { $p3[27:0], p3[63:28]$ }  (خط شکاف بین بیت 27 و 28)
+\item 
+اگر $even$ صفر باشد، { $p3[33:0], p3[63:34]$ } (خط شکاف بین بیت 33 و 34)
+
+ \end{itemize}
+   $P5x$ با توجه به $even$ مقدار میگیرد:
+   \begin{itemize}
+   \item
+   اگر $even$ یک باشد، { $p5[44:0], p5[63:45]$ }  (خط شکاف بین بیت 44 و 45)
+   \item
+اگر $even$ صفر باشد، { $p5[29:0], p5[63:30]$ } (خط شکاف بین بیت 29 و 30)
+\end{itemize}    
+   $P7x$ با توجه به $even$ مقدار میگیرد: 
+   \begin{itemize}
+   \item
+   اگر $even$ یک باشد، { $p7[26:0], p7[63:27]$ }  (خط شکاف بین بیت 26 و 27)
+   \item
+اگر $even$ صفر باشد، { $p7[39:0], p7[63:40]$ } (خط شکاف بین بیت 39 و 40)
+
+   \end{itemize}
+\item ماژول ۲
+\begin{code}
+	//module 2 
+	assign p0x = p0 + p3
+	assign p1x = (even) ? { p1[30:0], p1[63:31] } : { p1[50:0], p1[63:51] }
+	assign p2x = p2 + p1
+	assign p3x = (even) ? { p3[21:0], p3[63:22] } : { p3[46:0], p3[63:47] }
+	assign p4x = p4 + p7
+	assign p5x = (even) ? { p5[49:0], p5[63:50] } : { p5[53:0], p5[63:54] }
+	assign p6x = p6 + p5
+	assign p7x = (even) ? { p7[36:0], p7[63:37] } : { p7[13:0], p7[63:14] }
+\end{code}
+با توجه به توضیحات در مورد ماژول 1، در ماژول 2 با حفظ کلیات جزئیات تغییر میکند.
+
+\item ماژول ۳
+\begin{code}
+	//module 3
+	assign p0x = p0 + p5
+	assign p1x = (even) ? { p1[46:0], p1[63:47] } : { p1[38:0], p1[63:39] }
+	assign p2x = p2 + p7
+	assign p3x = (even) ? { p3[14:0], p3[63:15] } : { p3[34:0], p3[63:35] }
+	assign p4x = p4 + p1
+	assign p5x = (even) ? { p5[27:0], p5[63:28] } : { p5[24:0], p5[63:25] }
+	assign p6x = p6 + p3
+	assign p7x = (even) ? { p7[24:0], p7[63:25] } : { p7[20:0], p7[63:21] }
+\end{code}
+\item ماژول ۴
+\begin{code}
+	//module 4
+	assign p0x = p0 + p7
+	assign p1x = (even) ? { p1[19:0], p1[63:20] } : { p1[55:0], p1[63:56] }
+	assign p2x = p2 + p5
+	assign p3x = (even) ? { p3[ 7:0], p3[63: 8] } : { p3[41:0], p3[63:42] }
+	assign p4x = p4 + p3
+	assign p5x = (even) ? { p5[ 9:0], p5[63:10] } : { p5[ 7:0], p5[63: 8] }
+	assign p6x = p6 + p1
+	assign p7x = (even) ? { p7[54:0], p7[63:55] } : { p7[28:0], p7[63:29] }
+\end{code}
+ماژول های 3 و 4 هم در این مورد مشابهت دارند با توضیحات داده شده در مورد ماژول 1، $pkx$ های با$ k$ زوج مجموع دو $p$ هستند.  اگر $k$ فرد باشد،  $pkx$ برابر همان $pk$ خواهد بود با این تفاوت که با توجه به صفر یا یک بودن $even$ بین یکی از بیت های $pk$ شکاف میندازد و سمت چپ شکاف را در قسمت کمارزش خود و سمت راست شکاف را در قسمت پرارزش پر میکند. (در واقع جای بیت های چپ و راست شکاف را عوض میکند.)
+\end{itemize}
+\item
+تنها always-block در ماژول (حساس به لبه مثبت کلاک) :\\
+در این بلاک خروجی $out$، به صورت مجموعه های 64 بیتی مقداردهی میشود. $Out$ 512 بیتی است پس 8 بار مقدار دهی بازم است. برای هر 4 ماژول مقدار های نسبت داده شده به 64 بیتی های $out$ را (به ترتیب از پرارزش ترین 64بیت تا کم ارزشترین آن) داریم :
+\begin{itemize}
+\item ماژول ۱
+\lr{
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}lllllllll@{}}
+\toprule
+0                        & 1   & 2                        & 3   & 4                        & 6                        & 5   & 7   & Index \\ \midrule
+$p7x \textasciicircum p6x$ & $p6x$ & $p5x \textasciicircum p4x$ & $p4x$ & $p3x \textasciicircum p2x$ & $p1x \textasciicircum p0x$ & $p2x$ & $p0x$ & Value \\ \bottomrule
+\end{tabular}
+\label{table_skein_round_1}
+\end{table}}
+\item ماژول ۲
+\lr{
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}lllllllll@{}}
+\toprule
+0 & 1 & 2 & 3 & 4 & 6 & 5 & 7 & Index \\ \midrule
+$p7x \textasciicircum p4x$ & $p6x$ & $p5x \textasciicircum p6x$ & $p4x$ & $p3x \textasciicircum p0x$ & $p2x$ & $p1x \textasciicircum p2x$ & $p0x$ & Value \\ \bottomrule
+\end{tabular}
+\label{table_skein_round_2}
+\end{table}}
+\item ماژول ۳
+\lr{
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}lllllllll@{}}
+\toprule
+0 & 1 & 2 & 3 & 4 & 6 & 5 & 7 & Index \\ \midrule
+$p7x \textasciicircum p2x$ & $p6x$ & $p5x \textasciicircum p0x$ & $p4x$ & $p3x \textasciicircum p6x$ & $p2x$ & $p1x \textasciicircum p4x$ & $p0x$ & Value \\ \bottomrule
+\end{tabular}
+\label{table_skein_round_3}
+\end{table}}
+\item ماژول ۴
+\lr{
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}lllllllll@{}}
+\toprule
+0 & 1 & 2 & 3 & 4 & 6 & 5 & 7 & Index \\ \midrule
+$p7x \textasciicircum p0x$ & $p6x$ & $p5x \textasciicircum p2x$ & $p4x$ & $p3x \textasciicircum p4x$ & $p2x$ & $p1x \textasciicircum p6x$ & $p0x$ & Value \\ \bottomrule
+\end{tabular}
+\label{table_skein_round_4}
+\end{table}}
+\end{itemize}
+\end{itemize}
