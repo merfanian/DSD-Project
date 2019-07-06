@@ -79,6 +79,46 @@
 	#1 clk = ~clk;
 	endmodule
 \end{code}
+\pagebreak
+\subsubsection{\lr{Testbench 2}}
+\begin{code}
+module skein_tb;
+
+  // Inputs
+  reg clk;
+  reg [511:0] midstate;
+  reg [95:0] data;
+  reg [31:0] nonce;
+
+  // Outputs
+  wire [511:0] hash;
+
+  // Instantiate the Unit Under Test (UUT)
+  skein512 uut (
+    .clk(clk), 
+    .midstate(midstate), 
+    .data(data), 
+    .nonce(nonce), 
+    .hash(hash)
+  );
+
+  initial begin
+    // Initialize Inputs
+    clk = 0;
+    midstate = 0;
+    data = 0;
+    nonce = 0;
+
+    // Wait 100 ns for global reset to finish
+    #1000
+          data = "FF";
+    #5000;    
+  end
+   always 
+    #1 clk = ~clk;
+      
+endmodule
+\end{code}
 
 
 \subsection{شکل موج حاصل از Testbench}
@@ -86,8 +126,15 @@
 \subsubsection{\lr{Waveform 1}}
 \begin{figure}[H]
 	\includegraphics[width = \textwidth]{figs/simulation/1.png}
-	\caption{شبیه‌سازی با \lr{Testbench}}
+	\caption{شبیه‌سازی با \lr{Testbench 1}}
 	\label{simulation_1}
+\end{figure}
+
+\subsubsection{\lr{Waveform 2}}
+\begin{figure}[H]
+	\includegraphics[width = \textwidth]{figs/simulation/2.png}
+	\caption{شبیه‌سازی با \lr{Testbench 2}}
+	\label{simulation_2}
 \end{figure}
 
 \subsection{جدول ورودی‌ها و خروجی‌های  Testbench}
@@ -103,8 +150,22 @@
 			\end{tabular}%
 		}
 		\rl{
-			\caption{مقادیر ورودی‌ها و زمان }}
-		\label{table_input}
+			\caption{مقادیر ورودی‌ها و زمان برای \lr{Testbench 1} }}
+		\label{table_input_1}
+	\end{table}}
+
+\lr{
+	\begin{table}[H]
+	\centering
+			\begin{tabular}{@{}llll@{}}
+				\toprule
+				Midstate & Nonce   & Data                                    & Time (clk)  \\ \midrule
+				0        & 0       & 0                                       & 1000 - 0    \\
+				0	     & 0       & FF                       				 & End - 1000 \\ \bottomrule
+			\end{tabular}%
+		\rl{
+			\caption{مقادیر ورودی‌ها و زمان برای \lr{Testbench 2} }}
+		\label{table_input_2}
 	\end{table}}
 
 \lr{
@@ -112,7 +173,7 @@
 		\resizebox{\textwidth}{!}{%
 			\begin{tabular}{@{}ll@{}}
 				\toprule
-				Hash                                                                                        \\ \midrule
+				 Hash & Time                                                                                       \\ \midrule
 				\begin{tabular}[c]{@{}l@{}}ab5283d68df053ac62d053789d4b45b81a02c959d7cab97fc43451166351f117 \\ f949fe918475f762ba80567046338211461648316d4432e6c505edc3b5ee6ff5\end{tabular} & 1217 - 433        \\
 				\begin{tabular}[c]{@{}l@{}}dd477bfb0f07e299560b050c7aedb947bad77571f9a7d886a06f197a55f7946b \\ 8a9cecbb948a5478380168f8bfaf8e6d7d828459564973272b18cdf99d0234f2\end{tabular} & 1436 - 1217       \\
 				\begin{tabular}[c]{@{}l@{}}0c0dea4dfd9994c6eb97f500589565239347be8a5b2e4ce4832c6cc9095baa51 \\ bf2bdde45ef619f4086e71e7d86f637314357e6d20632c31612f5424644cc223\end{tabular} & 2217 - 1436       \\
@@ -121,9 +182,30 @@
 			\end{tabular}%
 		}
 		\rl{
-			\caption{مقادیر درهم‌سازی و زمان }}
-		\label{table_hash}
+			\caption{مقادیر درهم‌سازی و زمان  برای \lr{Testbench 1}}}
+		\label{table_hash_1}
 	\end{table}}
+	
+\lr{
+	\begin{table}[H]
+		\resizebox{\textwidth}{!}{%
+			\begin{tabular}{@{}ll@{}}
+				\toprule
+				Hash & Time                                                                                       \\ \midrule
+				\begin{tabular}[c]{@{}l@{}}ab5283d68df053ac62d053789d4b45b81a02c959d7cab97fc43451166351f117 \\ f949fe918475f762ba80567046338211461648316d4432e6c505edc3b5ee6ff5\end{tabular} & 1217 - 433        \\
+				\begin{tabular}[c]{@{}l@{}}5e63442c883739354bfbf8008368ac0c09c61fa86b430b2864bdfe41bf48dd9b\\
+8f653c22f3b712ad81f285ce4e81ca5083a9edcc07f7ddfdb0748e5b8fca57a7\end{tabular} & 1436 - 1217       \\
+				\begin{tabular}[c]{@{}l@{}}05f1df792b8b2322f3385ca477b829742688da8ef5a28af41be55da9e46374da\\
+580009173c55979ac88129b408773af6a92cd56f5ba4b48bc631b1f9c2e345d5\end{tabular} & End - 1436        \\
+			    \bottomrule
+			\end{tabular}%
+		}
+		\rl{
+			\caption{مقادیر درهم‌سازی و زمان برای \lr{Testbench 2}}}
+		\label{table_hash_2}
+	\end{table}}
+
+
 
 \section{اجرا و تحلیل کد نرم‌افزاری (مدل طلایی)}
 به همراه پروژه کد C الگوریتم Skein نیز به عنوان مدل طلایی ارائه شد، در ادامه مختصرا کد C مدل طلایی را تحلیل می‌کنیم.
