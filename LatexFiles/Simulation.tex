@@ -228,7 +228,7 @@ $buf$\\ آرایه ای به طول ۶۴ که بخش به بخش داداه را
 \item
 $ptr$\\ سایز بخش اشغال شده بافر
 \item
-$h0..h7$\\
+$h0..h7$\\$(uint64_t)$استفاده می‌شود.UBI برای محاسبه در :$h0, ..., h7$
  \item
  تعداد بلاک های داده\\$bcount$
 \end{itemize}
@@ -243,9 +243,95 @@ $h0..h7$\\
 دو متغیر $t0$ و $t1(threefish tweak)$ با استفاده از $bcount$  که متعلق به $ctx$ است و ورودی های تابع  $UBI\_BIG$ محاسبه میشوند و تابع $TFBIG\_KINIT$با ورودی های $h0 …h7 $مربوط به $ctx$ و $t0$ و $t1$ که قبلتر محاسبه شد فراخوانی میشود که با استفاده از آن و $TFBIG\_ADDKEY$ که با هم نقش  threefish اسکین را به عهده دارند $h0..h7$ مقدار دهی میشوند.به طوری که $hn = mn \textasciicircum pn$.\\
  و این مرحله تا وقتی داده ای که در بافر نرفته باقی  مانده ادامه دارد و سپس تمامی مقادیر $ctx$ در آن نوشته میشوند.(به جز بافر)\\
  تابع  $skein\_big\_close$ چند بیت اضافی (0 تا 7) را به محاسبات فعلی اضافه میکند.خروجی را در بافر ارائه شده میریزد و به پردازش خاتمه میدهد. زمینه یا $ctx$ به طور خودکار دوباره مقدار دهی اولیه می‌شود.ورودی این تابع به جز زمینه و آرایه‌ی خروجی،تعداد بیت های اضافه $n$ و خود بیت های اضافه $ub $میباشد که خود تابع دو ورودی آخر را مشخص می‌کند.اگر $n $صفر نباشد مقدار $x$ ای با استفاده از این دو تولید میشود که$ sph\_skein512$ آن فراخوانی میشود.در این مرحله، اگر $ptr == 0$ یعنی پیام خالی است؛ در غیر این صورت، بین 1 تا 64 بایت وجود دارد که هنوز پردازش نشده اند. در هر صورت بافر باید به یک بلوک کامل پر شده با صفر تبدیل شود(مشخصه Skein می گوید که پیام خالی پوشیده شده است تا حداقل یک بلوک برای پردازش وجود داشته باشد).
-  هنگامی که این بلوک پردازش شده است، این فرآیند دوباره با بلوک پر از صفر، برای خروجی (آن بلوک encoding "0"، بیش از 8 بایت و سپس با صفر پر شده) انجام می شود.
+  هنگامی که این بلوک پردازش شده است، این فرآیند دوباره با بلوک پر از صفر، برای خروجی (آن بلوک encoding "0"، بیش از 8 بایت و سپس با صفر پر شده) انجام می شود.\\
+  همانطور که در شکل 
+  \ref{skein_normal_hash}
+   میبینیم اسکین بر اساس چندین فراخوانی UBI ساخته شده است.
+نتیجه  محاسبات بلوک پیکربندی UBI برای تمام پیام‌ها ثابت است و می تواند به صورت IV از پیش محاسبه شود.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{figs/skein_normal_hash.png}
+\caption{نحوه کار Skein}
+\label{skein_normal_hash}
+\end{figure}
+
+\begin{ccode}
+static const sph_u64 IV512[] = {
+	SPH_C64(0x4903ADFF749C51CE), SPH_C64(0x0D95DE399746DF03),
+	SPH_C64(0x8FD1934127C79BCE), SPH_C64(0x9A255629FF352CB1),
+	SPH_C64(0x5DB62599DF6CA7B0), SPH_C64(0xEABE394CA9D5C3F4),
+	SPH_C64(0x991112C71A75B523), SPH_C64(0xAE18A40B660FCC33)
+};
+\end{ccode}
+\pagebreak
+\subsection{مشاهدهٔ خروجی‌های کد C}
+کد C که به همراه پروژه قرار داشت را اجرا کردیم، در ادامه تصویری از کد اجراشده و جدول خروجی‌های آن آمده است. 
+\begin{ccode}
+#include "miner.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
+#include<time.h>
+#include "sph_skein.h"
 
 
+ void skeinhash(void *output, const void *input)
+{
+	uint8_t hash[64];
+	sph_skein512_context ctx;
+	
+	sph_skein512_init(&ctx);
+	sph_skein512(&ctx, input,80);
+	sph_skein512_close(&ctx, (void*)hash);
+
+	
+	memcpy(output, hash,32);
+}
+
+void delay(unsigned int milliseconds){
+    
+    clock_t start = clock();
+    
+    while((clock() - start) * 1000 / CLOCKS_PER_SEC < milliseconds);
+}
+
+void print_hex(uint8_t *s, size_t len) {
+    //printf("%c",len);
+    for(int i = 0; i < 64; i++) {
+        printf("%x", s[i]);
+    }
+    printf("\n");
+}
+
+int main(int argc, const char * argv[]) {
+    uint8_t dst[64];
+    delay(100);
+    char buf[80] = "-29744673475978895854942682582";
+    skeinhash(dst, buf);
+    for(int i = 0; i < 64; i++) {
+        printf("%x", dst[i]);
+        printf(" ");
+    }
+      printf("\n");
+  
+    return 0;
+}
+\end{ccode}
+\pagebreak
+\begin{figure}[H]
+\includegraphics[width= \textwidth]{figs/simulation/output1.png}
+\caption{اجرای کد C}
+\label{c_output_1}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics[width= \textwidth]{figs/simulation/output2.png}
+\caption{اجرای کد C}
+\label{c_output_2}
+\end{figure}
 \subsection{مقایسه کد verilog با مدل طلایی و مرجع اصلی الگوریتم}
 همان‌طور که در خروجی‌های کد C و verilog مشهود است یکی از دو کد مدل طلایی یا کد سخت‌افزاری داری اشکالاتی‌ست که منجر به تفاوت خروجی می‌شود، طبق بررسی‌های انجام‌شده کد C با کد اصلی الگوریتم تطابق دارد و نتیجتا اشکال از کد verilog است. در ادامه مشکلات یافت‌شده در کد verilog ذکر خواهد شد. 
 \subsection{اصلاحالات موردنیاز کد verilog}
