@@ -48,7 +48,12 @@
 	      اعمال ریست‌ کلی بر سیستم
 	      \footnote{\lr{Global Reset}}
 	\item 
-	      تعیین ورودی‌های اولیه 
+	      تعیین ورودی‌های اولیه
+	      \begin{itemize}
+	      \item
+				\textit{ ورودی‌های سیستم در ادامه به طور کامل تشریح شده‌اند، هیچ یک از ورودی‌ها نسبت به دیگری تقدم 				زمانی هنگام assignment ندارد.}
+	      \end{itemize}
+	
 	\item 
 	      راه‌اندازی سیستم 
 \end{enumerate}
@@ -59,17 +64,23 @@
 \ref{block_diagram}
 آمده است. 
 
-\begin{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = \textwidth]{figs/DescriptionOfSystem/block_diagram.jpg}
+	\caption{دیاگرام بلوکی سخت‌افزار}
+	\label{block_diagram}
+\end{figure}
+\begin{figure}[H]
 \centering
 \begin{subfigure}{.5\textwidth}
   \centering
-  \includegraphics[width=0.6\linewidth]{figs/DescriptionOfSystem/hierarchial_design.png}
+  \includegraphics[width=0.5\linewidth]{figs/DescriptionOfSystem/hierarchial_design.png}
   \caption{ساختار ماژول‌ها هنگام شبیه‌سازی}
-  \label{block_diagram}
+  \label{module_diagram}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
   \centering
-  \includegraphics[width=0.6\linewidth]{figs/DescriptionOfSystem/wires_regs.png}
+  \includegraphics[width=0.5\linewidth]{figs/DescriptionOfSystem/wires_regs.png}
   \caption{ساختار سیگنال‌ها هنگام شبیه‌سازی}
   \label{wire_diagram}
 \end{subfigure}
@@ -77,6 +88,7 @@
 \label{hierarchial_design}
 \end{figure}
 
+\pagebreak
 \section{توصیف ماژول‌های سخت‌افزار}
 \subsection{\lr{Skein-512}}
 \subsubsection{اطلاعات کلی}
