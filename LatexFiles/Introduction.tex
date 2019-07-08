@@ -327,13 +327,22 @@ UBI
 	      استفاده کرد، از 
 	      MAC 
 	      برای وارسی این که یک پیام از یک فرستنده معتبر بدون تغییر ارسال شده یا که در طی مسیر دست‌کاری شده است استفاده می‌شود. 
-	\item \lr{\textbf{HMAC}}
-	\item \textbf{\lr{Randomized Hashing}}
-	\item \textbf{\lr{Digital Signatures}}
-	\item \textbf{\lr{Key Derivation Function (KDF)}}
-	\item \textbf{\lr{Password-Based Key Derivation Function (PBKDF)}}
-	\item \textbf{\lr{PRNG}}
-	\item \textbf{\lr{Stream Cipher}}
+	\item \lr{\textbf{HMAC}}\\
+	نوعی خاصی از MAC است که از یک تابع درهم‌سازی برای سنجش اعتبار پیام‌ها استفاده می‌کند.
+	\item \textbf{\lr{Randomized Hashing}}\\
+	نوع خاصی از درهم‌سازی که تابع درهم‌سازی را به صورت تصادفی انتخاب می‌کند،‌ در این حالت احتمال شکستن امنیت تابع به علت تصادف بودن تابع بسیار کاهش می‌یابد.
+	\item \textbf{\lr{Digital Signatures}}\\
+	امضای دیحیتال نوعی رمزنگاری نامتقارن است که برای تایید اعتبار فرستنده استفاده می‌شود.
+	\item \textbf{\lr{Key Derivation Function (KDF)}}\\
+	در رمزنگاری، یک تابع استخراج کلید (KDF) یک یا چند کلید مخفی را از یک مقدار مخفی مانند کلید اصلی، یک رمز عبور یا یک عبارت عبور با استفاده از یک تابع شبه تصادفی استخراج می‌کند.
+	\item \textbf{\lr{Password-Based Key Derivation Function (PBKDF)}}\\
+	نوعی خاصی از KDF هاست که برای مقابله با  
+	\lr{Brute force attacks}
+	طراحی شده است.
+	\item \textbf{\lr{PRNG}}\\
+	تابعی که برای تولید اعداد تصادفی استفاده می‌شود.
+	\item \textbf{\lr{Stream Cipher}}\\
+	یک رمز متقارن است که در آن هر رقم دنباله کلید اجرایی که توسط مولد رمز دنبال‌های تولید شده است، با رقم متناظر در متن اصلی، XOR می‌شود و رقم متناظر متن رمزی را تولید می‌کند.
 \end{itemize}
 \begin{thebibliography}{1}
 	
